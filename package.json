@@ -1,0 +1,26 @@
+{
+  "name": "photosweat-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for PhotoSweat: background removal for AI agents, on hosted GPUs",
+  "type": "module",
+  "bin": { "photosweat-mcp": "./server.mjs" },
+  "files": ["server.mjs", "client.mjs", "README.md", "LICENSE"],
+  "engines": { "node": ">=18" },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "background-removal",
+    "remove-background",
+    "image",
+    "ai-agents",
+    "transparent-png"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^3.25.0"
+  }
+}

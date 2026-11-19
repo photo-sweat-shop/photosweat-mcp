@@ -1,0 +1,2 @@
+# Keep line endings LF everywhere — this repo is consumed on macOS/Linux servers.
+* text=auto eol=lf

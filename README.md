@@ -41,6 +41,11 @@ Gemini CLI — the extension points at the hosted endpoint, so there is nothing 
 gemini extensions install https://github.com/photo-sweat-shop/photosweat-mcp
 ```
 
+Agent Plugins hosts (Cursor, VS Code, Copilot, ChatGPT, Codex, Kiro) — this repository is also an
+[Agent Plugins 1.0](https://agent-plugins.org) package: `plugin.json` plus a root `mcp.json` that
+declares the hosted server as `streamable-http`, so those hosts pick up the same endpoint with no
+local process.
+
 Claude Code:
 
 ```bash

@@ -1,6 +1,6 @@
 {
   "name": "photosweat-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Remove the background from a photo you provide and get a transparent PNG back. Hosted remote MCP server: nothing to install, no key required to start.",
   "contextFileName": "GEMINI.md",
   "mcpServers": {

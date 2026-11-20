@@ -65,6 +65,31 @@ Claude Desktop / Cursor / any client that reads an MCP config file:
 | `PHOTO_KEY` | *(unset)* | API key. Raises the daily allowance to 30 and gives you a stable identity |
 | `PHOTO_MCP_ALL` | *(unset)* | `1` also registers paused tools. For testing the schema generation; don't set it in normal use |
 
+## Or skip the install
+
+The same capability is served remotely over Streamable HTTP — no clone, no `npm install`, no key:
+
+```json
+{ "mcpServers": { "photosweat": { "url": "https://photosweat.shop/mcp" } } }
+```
+
+Claude Code:
+
+```bash
+claude mcp add --transport http photosweat https://photosweat.shop/mcp
+```
+
+That endpoint exposes one tool, `remove_background`, taking `image_url` or `image_base64` and
+returning the cut-out as an image content block. The anonymous quota is 10 images/day per IP.
+Per-client instructions: https://photosweat.shop/remove-background-mcp
+
+Registered in the official MCP Registry as `shop.photosweat/remove-background`.
+
+Note that the tool names differ by transport: the local server in this repo generates its tools
+from `/api/capabilities` (currently `photo_image_cutout`, which takes a **file path**), while the
+remote endpoint exposes `remove_background`, which takes **image bytes**. Same pipeline, same
+allowance — only where the file lives differs.
+
 ## Tools
 
 Exactly one tool is registered today, because exactly one capability is open.

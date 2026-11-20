@@ -35,6 +35,12 @@ Node 18 or newer.
 
 ## Connect it
 
+Gemini CLI — the extension points at the hosted endpoint, so there is nothing to clone or build:
+
+```bash
+gemini extensions install https://github.com/photo-sweat-shop/photosweat-mcp
+```
+
 Claude Code:
 
 ```bash

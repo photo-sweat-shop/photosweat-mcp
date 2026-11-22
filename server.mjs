@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // GENERATED FILE — do not edit in this repository.
 // Source of truth: photo-tool/web/mcp/server.mjs. Re-sync with `node tools/sync-mcp-repo.mjs`.
-// PhotoSweat MCP server (stdio).
+// Photo Sweat Shop MCP server (stdio).
 //
 // The tool list is not hand-written: on startup we read GET /api/capabilities once and
 // register one tool per capability, generating each parameter schema from the capability
@@ -46,7 +46,10 @@ function paramZod(spec) {
   return spec.default !== undefined ? s.default(spec.default) : s.optional();
 }
 
-const toolName = (id) => "photo_" + id.replace(/[^a-zA-Z0-9]+/g, "_").toLowerCase();
+// 工具名与托管端点同一套规则：能力 slug 派生（remove_background / upscale），
+// 也就是 /api/{slug} 和 /api/tools 里的那个名字。加能力只改能力表，两端一起变。
+const toolName = (cap) =>
+  (cap.slug ?? cap.id.replace(/[^a-zA-Z0-9]+/g, "_").toLowerCase()).replace(/-/g, "_");
 
 async function main() {
   let doc;
@@ -58,7 +61,7 @@ async function main() {
     process.exit(1);
   }
 
-  const server = new McpServer({ name: NAME, version: "0.2.0" });
+  const server = new McpServer({ name: NAME, version: "0.3.0" });
 
   // Register only what is actually open (live / beta). The capability document also lists
   // paused tools; registering them would just invite the agent to pick one that is
@@ -84,7 +87,7 @@ async function main() {
     for (const [name, spec] of Object.entries(cap.params || {})) shape[name] = paramZod(spec);
 
     server.registerTool(
-      toolName(cap.id),
+      toolName(cap),
       {
         title: cap.title?.en || cap.id,
         description:
@@ -116,7 +119,7 @@ async function main() {
         }
       }
     );
-    console.error(`[photo-workshop] tool ${toolName(cap.id)}`);
+    console.error(`[photo-workshop] tool ${toolName(cap)}`);
   }
 
   await server.connect(new StdioServerTransport());

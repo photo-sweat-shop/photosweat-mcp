@@ -1,14 +1,17 @@
 # PhotoSweat MCP server
 
-An [MCP](https://modelcontextprotocol.io) server for **background removal**. An agent hands
-it the absolute path to a photo; it calls the hosted PhotoSweat API, writes the cut-out PNG
-next to the original, and returns that path.
+An [MCP](https://modelcontextprotocol.io) server for **background removal and upscaling**. An agent
+hands it the absolute path to a photo; it calls the hosted PhotoSweat API, writes the result next to
+the original, and returns that path.
+
+One server, several tools — today the live `remove_background` and the beta `upscale`, both named
+after their REST slugs. The list grows as capabilities open, and nothing is hand-written twice.
 
 No GPU, no API client to write, no key required to start — the free tier is 10 images a day
 per IP.
 
 ```text
-photo_image_cutout({ path: "/Users/me/photo.jpg" })
+remove_background({ path: "/Users/me/photo.jpg" })
   → Saved image/png to /Users/me/photo-cutout.png (1437218 bytes). jobId: 5f0c…
 ```
 
@@ -90,24 +93,30 @@ Claude Code:
 claude mcp add --transport http photosweat https://photosweat.shop/mcp
 ```
 
-That endpoint exposes one tool, `remove_background`, taking `image_url` or `image_base64` and
-returning the cut-out as an image content block. The anonymous quota is 10 images/day per IP.
+That endpoint exposes the same two tools the local server registers — `remove_background` and the
+beta `upscale` — taking `image_url` or `image_base64` and returning the result as an image content
+block. Names are derived from the REST slugs, so they match `POST /api/remove-background` and
+`POST /api/upscale`. The anonymous quota is 10 images/day per IP.
 Per-client instructions: https://photosweat.shop/remove-background-mcp
 
 Registered in the official MCP Registry as `shop.photosweat/remove-background`.
 
-Note that the tool names differ by transport: the local server in this repo generates its tools
-from `/api/capabilities` (currently `photo_image_cutout`, which takes a **file path**), while the
-remote endpoint exposes `remove_background`, which takes **image bytes**. Same pipeline, same
-allowance — only where the file lives differs.
+The only difference between the two transports is where the image lives: the local server in this
+repo takes a **file path**, the remote endpoint takes **image bytes**. Same pipeline, same
+allowance. An upscale takes 30–60 s, longer than a tool call should block, so on the hosted
+endpoint it usually returns text carrying a `status_url` — poll that and fetch `result_url` rather
+than resending the image.
 
 ## Tools
 
-Exactly one tool is registered today, because exactly one capability is open.
+Two tools are registered today: the live cutout and the beta upscale. Both are generated from
+`/api/capabilities` at startup, so a parameter's default is whatever that document says, and the
+names are the same ones the hosted endpoint uses.
 
 | Tool | Arguments |
 |---|---|
-| `photo_image_cutout` | `path` (required), `out`, `background`, `color`, `format` |
+| `remove_background` | `path` (required), `out`, `background`, `color`, `format` |
+| `upscale` *(beta)* | `path` (required), `out`, `scale`, `engine`, `verifyText` |
 
 - `path` — absolute path to a JPG / PNG / WebP file, 10 MB max.
 - `out` — where to write the result; defaults to `<input>-<capability>.<ext>`.
@@ -115,9 +124,14 @@ Exactly one tool is registered today, because exactly one capability is open.
 - `color` — `#rrggbb`, only used when `background` is `color`.
 - `format` — `png` (default) or `jpeg`. JPEG only works on opaque backgrounds; transparency
   requires PNG.
+- `scale` — `2` or `4` (default `4`); prefer `2` for packaging, labels and other dense text.
+- `engine` — `ultrasharp` (default) or `x4plus`; `x4plus` keeps text edges cleaner.
+- `verifyText` — **off by default**. Turn it on to OCR the source and the result and receive a
+  list of missing or changed characters; it adds roughly 5 s on sparse text and up to 30 s on
+  dense layouts, because it runs on CPU.
 
-Other capabilities in the document (restore, colorize, white-background, erase, upscale,
-extend) are `paused` and will be registered automatically if they reopen.
+Other capabilities in the document (restore, colorize, white-background, erase, extend) are
+`paused` and will be registered automatically if they reopen.
 
 ## Under the hood
 

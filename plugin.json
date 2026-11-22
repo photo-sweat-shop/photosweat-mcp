@@ -1,14 +1,21 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "photosweat-mcp",
-  "version": "1.0.1",
-  "description": "Remove the background from a photo you provide and get a transparent PNG back. Hosted remote MCP server: nothing to install, no key required to start.",
+  "version": "1.0.2",
+  "description": "Remove a photo's background, or upscale it 2x/4x, on one hosted MCP endpoint: nothing to install, no key to start.",
   "author": {
     "name": "PhotoSweat",
     "url": "https://photosweat.shop"
   },
-  "homepage": "https://photosweat.shop/remove-background-mcp",
+  "homepage": "https://photosweat.shop/mcp-server",
   "repository": "https://github.com/photo-sweat-shop/photosweat-mcp",
   "license": "MIT",
-  "keywords": ["background-removal", "remove-background", "transparent-png", "image", "mcp"]
+  "keywords": [
+    "background-removal",
+    "remove-background",
+    "transparent-png",
+    "image",
+    "mcp",
+    "upscaling"
+  ]
 }

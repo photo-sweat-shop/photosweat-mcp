@@ -115,7 +115,7 @@ names are the same ones the hosted endpoint uses.
 
 | Tool | Arguments |
 |---|---|
-| `remove_background` | `path` (required), `out`, `background`, `color`, `format` |
+| `remove_background` | `path` (required), `out`, `background`, `color`, `format`, `fillRatio`, `longEdge`, `verifyText` |
 | `upscale` *(beta)* | `path` (required), `out`, `scale`, `engine`, `verifyText` |
 
 - `path` — absolute path to a JPG / PNG / WebP file, 10 MB max.
@@ -124,6 +124,15 @@ names are the same ones the hosted endpoint uses.
 - `color` — `#rrggbb`, only used when `background` is `color`.
 - `format` — `png` (default) or `jpeg`. JPEG only works on opaque backgrounds; transparency
   requires PNG.
+- `fillRatio` — marketplace framing, `0` (default) keeps the canvas at the input size. `1`–`100`
+  crops to the subject and centres it on a square canvas, the subject's **longest side** taking
+  that share of the canvas side — the measure marketplaces use for "subject fill".
+- `longEdge` — side of that square canvas in px, `0`–`4096`, default `0` (derive it from
+  `fillRatio` without resampling the subject).
+- `verifyText` — **off by default**. Turn it on to OCR the source and the result and receive a
+  list of missing or changed characters; it adds roughly 4–30 s, because it runs on CPU. On the
+  small backup GPU it may come back as `unavailable` instead of a verdict; the image is
+  unaffected either way.
 - `scale` — `2` or `4` (default `4`); prefer `2` for packaging, labels and other dense text.
 - `engine` — `ultrasharp` (default) or `x4plus`; `x4plus` keeps text edges cleaner.
 - `verifyText` — **off by default**. Turn it on to OCR the source and the result and receive a

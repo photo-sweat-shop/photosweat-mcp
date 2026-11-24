@@ -15,7 +15,7 @@ const MIME = {
 export const DEFAULT_API = process.env.PHOTO_API || "https://photosweat.shop";
 const MAX_BYTES = 10 * 1024 * 1024;
 
-// Optional API key. Anonymous access is 10 images/day per exit IP; a key is 30/day and
+// Optional API key. Anonymous access is 10 credits/day per exit IP; a key is 30 credits/day and
 // gives you a stable identity (anonymous accounting follows the IP, so a proxy hop
 // makes you a different person).
 const KEY = process.env.PHOTO_KEY || "";

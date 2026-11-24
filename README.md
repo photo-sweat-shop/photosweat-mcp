@@ -7,8 +7,8 @@ the original, and returns that path.
 One server, several tools — today the live `remove_background` and the beta `upscale`, both named
 after their REST slugs. The list grows as capabilities open, and nothing is hand-written twice.
 
-No GPU, no API client to write, no key required to start — the free tier is 10 images a day
-per IP.
+No GPU, no API client to write, no key required to start — the free tier is 10 credits a day
+per IP (one cutout = 1 credit, one upscale = 2).
 
 ```text
 remove_background({ path: "/Users/me/photo.jpg" })
@@ -96,7 +96,7 @@ claude mcp add --transport http photosweat https://photosweat.shop/mcp
 That endpoint exposes the same two tools the local server registers — `remove_background` and the
 beta `upscale` — taking `image_url` or `image_base64` and returning the result as an image content
 block. Names are derived from the REST slugs, so they match `POST /api/remove-background` and
-`POST /api/upscale`. The anonymous quota is 10 images/day per IP.
+`POST /api/upscale`. The anonymous quota is 10 credits/day per IP (an upscale costs 2).
 Per-client instructions: https://photosweat.shop/remove-background-mcp
 
 Registered in the official MCP Registry as `shop.photosweat/remove-background`.
@@ -116,7 +116,8 @@ names are the same ones the hosted endpoint uses.
 | Tool | Arguments |
 |---|---|
 | `remove_background` | `path` (required), `out`, `background`, `color`, `format`, `fillRatio`, `longEdge`, `verifyText` |
-| `upscale` *(beta)* | `path` (required), `out`, `scale`, `engine`, `verifyText` |
+| `upscale` *(beta)* | `path` (required), `out`, `scale`, `engine`, `face`, `verifyText` |
+| `erase` *(beta)* | `path` (required), `mask` (required), `out` |
 
 - `path` — absolute path to a JPG / PNG / WebP file, 10 MB max.
 - `out` — where to write the result; defaults to `<input>-<capability>.<ext>`.
@@ -135,11 +136,19 @@ names are the same ones the hosted endpoint uses.
   unaffected either way.
 - `scale` — `2` or `4` (default `4`); prefer `2` for packaging, labels and other dense text.
 - `engine` — `ultrasharp` (default) or `x4plus`; `x4plus` keeps text edges cleaner.
+- `face` — **on by default**. After enlarging, faces are restored once (no reshaping, no blue-iris
+  artifact), about a second per face, up to 8 faces per image. Send `false` to skip it. Same price
+  either way.
 - `verifyText` — **off by default**. Turn it on to OCR the source and the result and receive a
   list of missing or changed characters; it adds roughly 5 s on sparse text and up to 30 s on
   dense layouts, because it runs on CPU.
 
-Other capabilities in the document (restore, colorize, white-background, erase, extend) are
+`erase` is **beta** as of 2026-11-23. This stdio server already knows how to send a mask, so it
+registers the tool with an extra `mask` argument (absolute path to a PNG: white = the area to
+erase). The hosted `/mcp` endpoint has no mask channel yet, so it deliberately does not list
+`erase` — use this package, or REST multipart, for erasing.
+
+Other capabilities in the document (restore, colorize, extend, scan-text, generate) are
 `paused` and will be registered automatically if they reopen.
 
 ## Under the hood
@@ -173,8 +182,8 @@ bytes, and `?params={"background":"white"}` to change the options.
 ## Limits
 
 - 10 MB per image; JPG, PNG or WebP.
-- 10 images/day anonymously (per IP), 30/day with a key, 200/day signed in on the website.
-- Past the free allowance: prepaid credits at **$0.01/image** ($10 = 1,000 images).
+- 10 credits/day anonymously (per IP), 30 credits/day with a key, 200 credits/day signed in on the website.
+- Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout costs 1, an upscale 2.
 - Anonymous requests are rate-limited to 30/minute.
 - Results are deleted after 24 hours. Save them yourself.
 

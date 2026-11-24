@@ -1,7 +1,7 @@
 {
   "name": "photosweat-mcp",
-  "version": "0.3.0",
-  "description": "MCP server for PhotoSweat: background removal and 2x/4x upscaling for AI agents, on hosted GPUs",
+  "version": "0.3.1",
+  "description": "MCP server for Photo Sweat Shop: background removal and 2x/4x upscaling for AI agents, on hosted GPUs",
   "type": "module",
   "bin": {
     "photosweat-mcp": "./server.mjs"

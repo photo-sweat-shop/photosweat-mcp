@@ -1,7 +1,7 @@
-# PhotoSweat MCP server
+# Photo Sweat Shop MCP server
 
 An [MCP](https://modelcontextprotocol.io) server for **background removal and upscaling**. An agent
-hands it the absolute path to a photo; it calls the hosted PhotoSweat API, writes the result next to
+hands it the absolute path to a photo; it calls the hosted Photo Sweat Shop API, writes the result next to
 the original, and returns that path.
 
 One server, several tools — today the live `remove_background` and the beta `upscale`, both named
@@ -52,7 +52,7 @@ local process.
 Claude Code:
 
 ```bash
-claude mcp add photo-workshop -- node /absolute/path/to/photosweat-mcp/server.mjs
+claude mcp add photosweat -- node /absolute/path/to/photosweat-mcp/server.mjs
 ```
 
 Claude Desktop / Cursor / any client that reads an MCP config file:
@@ -60,7 +60,7 @@ Claude Desktop / Cursor / any client that reads an MCP config file:
 ```json
 {
   "mcpServers": {
-    "photo-workshop": {
+    "photosweat": {
       "command": "node",
       "args": ["/absolute/path/to/photosweat-mcp/server.mjs"],
       "env": {
@@ -182,7 +182,7 @@ bytes, and `?params={"background":"white"}` to change the options.
 ## Limits
 
 - 10 MB per image; JPG, PNG or WebP.
-- 10 credits/day anonymously (per IP), 30 credits/day with a key, 200 credits/day signed in on the website.
+- 10 credits/day anonymously (per IP), 30 credits/day with a free account (the website and your API key share it).
 - Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout costs 1, an upscale 2.
 - Anonymous requests are rate-limited to 30/minute.
 - Results are deleted after 24 hours. Save them yourself.

@@ -14,7 +14,10 @@ import { z } from "zod";
 import { DEFAULT_API, fetchCapabilities, runJob } from "./client.mjs";
 
 const API = DEFAULT_API;
-const NAME = "photo-workshop";
+// 产品名（2026-11-25 统一）：这里原来写的是 "photo-workshop"，和线上服务卡、托管 MCP 的
+// serverInfo 对不上。`name` 是客户端上显示的实现名，标识符走 npm 包名 `photosweat-mcp`。
+const NAME = "Photo Sweat Shop";
+const VERSION = "0.3.1";
 
 function paramZod(spec) {
   let s;
@@ -56,12 +59,12 @@ async function main() {
   try {
     doc = await fetchCapabilities(API);
   } catch (e) {
-    console.error(`[photo-workshop] could not load ${API}/api/capabilities: ${e.message}`);
-    console.error("[photo-workshop] check the network, or set PHOTO_API to a different base URL and retry.");
+    console.error(`[photo-sweat-shop] could not load ${API}/api/capabilities: ${e.message}`);
+    console.error("[photo-sweat-shop] check the network, or set PHOTO_API to a different base URL and retry.");
     process.exit(1);
   }
 
-  const server = new McpServer({ name: NAME, version: "0.3.0" });
+  const server = new McpServer({ name: NAME, version: VERSION });
 
   // Register only what is actually open (live / beta). The capability document also lists
   // paused tools; registering them would just invite the agent to pick one that is
@@ -73,7 +76,7 @@ async function main() {
   let registered = 0;
   for (const cap of doc.capabilities) {
     if (!ALL && cap.status !== "live" && cap.status !== "beta") {
-      console.error(`[photo-workshop] skip ${cap.id} (${cap.status})`);
+      console.error(`[photo-sweat-shop] skip ${cap.id} (${cap.status})`);
       continue;
     }
     registered++;
@@ -119,14 +122,14 @@ async function main() {
         }
       }
     );
-    console.error(`[photo-workshop] tool ${toolName(cap)}`);
+    console.error(`[photo-sweat-shop] tool ${toolName(cap)}`);
   }
 
   await server.connect(new StdioServerTransport());
-  console.error(`[photo-workshop] ready · ${registered} tools · ${API}`);
+  console.error(`[photo-sweat-shop] ready · ${registered} tools · ${API}`);
 }
 
 main().catch((e) => {
-  console.error("[photo-workshop] fatal:", e?.message || e);
+  console.error("[photo-sweat-shop] fatal:", e?.message || e);
   process.exit(1);
 });

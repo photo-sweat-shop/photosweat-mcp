@@ -1,4 +1,4 @@
-# PhotoSweat — background removal and upscaling
+# Photo Sweat Shop — background removal and upscaling
 
 This extension adds one remote MCP server, `photosweat` (`https://photosweat.shop/mcp`), with two
 tools:

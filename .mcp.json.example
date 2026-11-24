@@ -1,8 +1,10 @@
 {
   "mcpServers": {
-    "photo-workshop": {
+    "photosweat": {
       "command": "node",
-      "args": ["/absolute/path/to/photosweat-mcp/server.mjs"],
+      "args": [
+        "/absolute/path/to/photosweat-mcp/server.mjs"
+      ],
       "env": {
         "PHOTO_API": "https://photosweat.shop",
         "PHOTO_KEY": ""

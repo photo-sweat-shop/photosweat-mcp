@@ -1,14 +1,15 @@
 # Photo Sweat Shop MCP server
 
-An [MCP](https://modelcontextprotocol.io) server for **background removal and upscaling**. An agent
-hands it the absolute path to a photo; it calls the hosted Photo Sweat Shop API, writes the result next to
-the original, and returns that path.
+An [MCP](https://modelcontextprotocol.io) server for **background removal, upscaling and
+colorizing**. An agent hands it the absolute path to a photo; it calls the hosted Photo Sweat
+Shop API, writes the result next to the original, and returns that path.
 
-One server, several tools — today the live `remove_background` and the beta `upscale`, both named
-after their REST slugs. The list grows as capabilities open, and nothing is hand-written twice.
+One server, several tools — today the live `remove_background` and the beta `upscale` and
+`colorize`, all named after their REST slugs. The list grows as capabilities open, and nothing
+is hand-written twice.
 
 No GPU, no API client to write, no key required to start — the free tier is 10 credits a day
-per IP (one cutout = 1 credit, one upscale = 2).
+per IP (a cutout or a colorize = 1 credit, an upscale = 2).
 
 ```text
 remove_background({ path: "/Users/me/photo.jpg" })
@@ -93,10 +94,12 @@ Claude Code:
 claude mcp add --transport http photosweat https://photosweat.shop/mcp
 ```
 
-That endpoint exposes the same two tools the local server registers — `remove_background` and the
-beta `upscale` — taking `image_url` or `image_base64` and returning the result as an image content
-block. Names are derived from the REST slugs, so they match `POST /api/remove-background` and
-`POST /api/upscale`. The anonymous quota is 10 credits/day per IP (an upscale costs 2).
+That endpoint exposes three of the tools the local server registers — `remove_background`, the
+beta `upscale` and the beta `colorize` — taking `image_url` or `image_base64` and returning the
+result as an image content block. (`erase` is local-only: it needs a mask channel.) Names are
+derived from the REST slugs, so they match `POST /api/remove-background`, `POST /api/upscale` and
+`POST /api/colorize`. The anonymous quota is 10 credits/day per IP (an upscale costs 2; a cutout
+or a colorize costs 1).
 Per-client instructions: https://photosweat.shop/remove-background-mcp
 
 Registered in the official MCP Registry as `shop.photosweat/remove-background`.
@@ -109,14 +112,15 @@ than resending the image.
 
 ## Tools
 
-Two tools are registered today: the live cutout and the beta upscale. Both are generated from
-`/api/capabilities` at startup, so a parameter's default is whatever that document says, and the
-names are the same ones the hosted endpoint uses.
+Tools are registered from `/api/capabilities` at startup, so a parameter's default is whatever
+that document says, and the names are the same ones the hosted endpoint uses. Today that is the
+live cutout and the beta upscale and colorize (plus the local-only `erase`).
 
 | Tool | Arguments |
 |---|---|
 | `remove_background` | `path` (required), `out`, `background`, `color`, `format`, `fillRatio`, `longEdge`, `verifyText` |
 | `upscale` *(beta)* | `path` (required), `out`, `scale`, `engine`, `face`, `verifyText` |
+| `colorize` *(beta)* | `path` (required), `out`, `face` |
 | `erase` *(beta)* | `path` (required), `mask` (required), `out` |
 
 - `path` — absolute path to a JPG / PNG / WebP file, 10 MB max.
@@ -136,9 +140,9 @@ names are the same ones the hosted endpoint uses.
   unaffected either way.
 - `scale` — `2` or `4` (default `4`); prefer `2` for packaging, labels and other dense text.
 - `engine` — `ultrasharp` (default) or `x4plus`; `x4plus` keeps text edges cleaner.
-- `face` — **on by default**. After enlarging, faces are restored once (no reshaping, no blue-iris
-  artifact), about a second per face, up to 8 faces per image. Send `false` to skip it. Same price
-  either way.
+- `face` — **on by default**. After enlarging or colorizing, faces are restored once (no
+  reshaping, no blue-iris artifact; skin does not go yellow-green), about a second per face, up
+  to 8 faces per image. Send `false` to skip it. Same price either way.
 - `verifyText` — **off by default**. Turn it on to OCR the source and the result and receive a
   list of missing or changed characters; it adds roughly 5 s on sparse text and up to 30 s on
   dense layouts, because it runs on CPU.
@@ -148,7 +152,12 @@ registers the tool with an extra `mask` argument (absolute path to a PNG: white 
 erase). The hosted `/mcp` endpoint has no mask channel yet, so it deliberately does not list
 `erase` — use this package, or REST multipart, for erasing.
 
-Other capabilities in the document (restore, colorize, extend, scan-text, generate) are
+`colorize` is **beta** as of 2026-11-25. This stdio server picks it up automatically from the
+capability document: an absolute `path` plus `face` (on by default). A photo that is already in
+colour is not recoloured and not charged — but, like every colorize result, it comes back as a
+JPEG at most 1024 px on the long edge.
+
+Other capabilities in the document (restore, extend, scan-text, generate) are
 `paused` and will be registered automatically if they reopen.
 
 ## Under the hood
@@ -183,7 +192,10 @@ bytes, and `?params={"background":"white"}` to change the options.
 
 - 10 MB per image; JPG, PNG or WebP.
 - 10 credits/day anonymously (per IP), 30 credits/day with a free account (the website and your API key share it).
-- Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout costs 1, an upscale 2.
+- Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout or
+  a colorize costs 1, an upscale 2.
+- Colorize output is always a JPEG at most 1024 px on the long edge (an already-colour photo is
+  not recoloured and not charged, but it is still returned as such a JPEG).
 - Anonymous requests are rate-limited to 30/minute.
 - Results are deleted after 24 hours. Save them yourself.
 

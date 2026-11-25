@@ -1,7 +1,7 @@
 {
   "name": "photosweat-mcp",
-  "version": "1.0.4",
-  "description": "Remove a photo's background, or upscale it 2x/4x, on one hosted MCP endpoint: nothing to install, no key to start.",
+  "version": "1.0.5",
+  "description": "Remove a photo's background, upscale it 2x/4x or colorize a black-and-white photo, on one hosted MCP endpoint: nothing to install, no key to start.",
   "contextFileName": "GEMINI.md",
   "mcpServers": {
     "photosweat": {

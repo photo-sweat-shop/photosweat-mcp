@@ -19,7 +19,7 @@ tools:
   **no parameters**: faces are redrawn with the rest of the photo, nothing is pasted back. Redraws
   the whole photo to remove halftone and print grain, reduce scratches and stains, and restore
   natural colour (the aspect ratio is unchanged). The result is always a JPEG whose long edge is at
-  most 1024 px. Colour photos are restored too — same model, same 1 credit.
+  most 1024 px. Colour photos are restored too — same model, same 2 credits.
 
 Use it when the user asks to remove, erase, or replace the background of a photo, wants a
 transparent PNG cut-out of a product or portrait, asks to enlarge / upscale an image, or wants an
@@ -28,7 +28,7 @@ old photo restored (scratches reduced, colour brought back).
 Notes:
 
 - 10 MB max per image; JPG, PNG or WebP.
-- Free tier is 10 credits a day per IP with no key (a cutout or a colorize costs 1, an upscale 2).
+- Free tier is 10 credits a day per IP with no key (a cutout costs 1; an upscale or an old photo restoration 2).
   Do not ask the user for a key unless the call fails with `quota_exceeded`.
 - Transparency needs `format: "png"` (the default). `jpeg` only works with an opaque background.
 - If the call returns `404 tool_paused`, the tool is temporarily disabled — tell the user

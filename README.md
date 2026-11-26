@@ -9,7 +9,7 @@ One server, several tools — today the live `remove_background` and the beta `u
 is hand-written twice.
 
 No GPU, no API client to write, no key required to start — the free tier is 10 credits a day
-per IP (a cutout or a colorize = 1 credit, an upscale = 2).
+per IP (a cutout or an erase = 1 credit; an upscale or an old photo restoration = 2).
 
 ```text
 remove_background({ path: "/Users/me/photo.jpg" })
@@ -98,8 +98,8 @@ That endpoint exposes three of the tools the local server registers — `remove_
 beta `upscale` and the beta `colorize` — taking `image_url` or `image_base64` and returning the
 result as an image content block. (`erase` is local-only: it needs a mask channel.) Names are
 derived from the REST slugs, so they match `POST /api/remove-background`, `POST /api/upscale` and
-`POST /api/colorize`. The anonymous quota is 10 credits/day per IP (an upscale costs 2; a cutout
-or a colorize costs 1).
+`POST /api/colorize`. The anonymous quota is 10 credits/day per IP (a cutout costs 1; an upscale
+or an old photo restoration costs 2).
 Per-client instructions: https://photosweat.shop/remove-background-mcp
 
 Registered in the official MCP Registry as `shop.photosweat/remove-background`.
@@ -158,7 +158,7 @@ shown (web page `/restore`; the slug is unchanged). It redraws the whole photo �
 grain removed, scratches and stains reduced, colour restored — so the result differs visibly from
 the original, with the aspect ratio unchanged. An absolute `path` is all it takes: there are no
 parameters, because the whole photo including faces is redrawn in one pass (nothing is pasted
-back). Colour photos are restored too — same model, same 1 credit, no short-circuit — and every
+back). Colour photos are restored too — same model, same 2 credits, no short-circuit — and every
 result comes back as a JPEG at most 1024 px on the long edge.
 
 Other capabilities in the document (enhance, extend, scan-text, generate) are
@@ -197,9 +197,9 @@ bytes, and `?params={"background":"white"}` to change the options.
 - 10 MB per image; JPG, PNG or WebP.
 - 10 credits/day anonymously (per IP), 30 credits/day with a free account (the website and your API key share it).
 - Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout or
-  a colorize costs 1, an upscale 2.
+  an erase costs 1, an upscale or an old photo restoration 2.
 - Old-photo-restoration output is always a JPEG at most 1024 px on the long edge; a colour photo is
-  restored by the same redraw and costs the same 1 credit.
+  restored by the same redraw and costs the same 2 credits.
 - Anonymous requests are rate-limited to 30/minute.
 - Results are deleted after 24 hours. Save them yourself.
 

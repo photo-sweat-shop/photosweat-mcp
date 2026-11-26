@@ -1,4 +1,4 @@
-# Photo Sweat Shop — background removal, upscaling and colorizing
+# Photo Sweat Shop — background removal, upscaling and old photo restoration
 
 This extension adds one remote MCP server, `photosweat` (`https://photosweat.shop/mcp`), with three
 tools:
@@ -15,14 +15,15 @@ tools:
   Enlarges the image 2× or 4×.
   It takes 30–60 s, so it usually returns text with a `status_url` — poll that and fetch
   `result_url`; do not resend the image.
-- `colorize` *(beta)* — same image arguments, plus `face` (bool, default **on**: restores faces
-  after colorizing so skin does not go yellow-green; up to 8 faces). Colorizes a black-and-white
-  photo. The result is always a JPEG whose long edge is at most 1024 px; a photo already in
-  colour is not recoloured and is not charged, but it still comes back as such a JPEG.
+- `colorize` *(beta)* — old photo restoration (the web page is `/restore`). Same image arguments and
+  **no parameters**: faces are redrawn with the rest of the photo, nothing is pasted back. Redraws
+  the whole photo to remove halftone and print grain, reduce scratches and stains, and restore
+  natural colour (the aspect ratio is unchanged). The result is always a JPEG whose long edge is at
+  most 1024 px. Colour photos are restored too — same model, same 1 credit.
 
 Use it when the user asks to remove, erase, or replace the background of a photo, wants a
 transparent PNG cut-out of a product or portrait, asks to enlarge / upscale an image, or wants an
-old black-and-white photo colorized.
+old photo restored (scratches reduced, colour brought back).
 
 Notes:
 

@@ -8,7 +8,7 @@ One server, several tools — today the live `remove_background` and the beta `u
 `colorize`, all named after their REST slugs. The list grows as capabilities open, and nothing
 is hand-written twice.
 
-No GPU, no API client to write, no key required to start — the free tier is 10 credits a day
+No GPU, no API client to write, no key required to start — the free tier is 10 credits a day (60 a month)
 per IP (a cutout or an erase = 1 credit; an upscale or an old photo restoration = 2).
 
 ```text
@@ -98,7 +98,7 @@ That endpoint exposes three of the tools the local server registers — `remove_
 beta `upscale` and the beta `colorize` — taking `image_url` or `image_base64` and returning the
 result as an image content block. (`erase` is local-only: it needs a mask channel.) Names are
 derived from the REST slugs, so they match `POST /api/remove-background`, `POST /api/upscale` and
-`POST /api/colorize`. The anonymous quota is 10 credits/day per IP (a cutout costs 1; an upscale
+`POST /api/colorize`. The anonymous quota is 10 credits/day (60 a month) per IP (a cutout costs 1; an upscale
 or an old photo restoration costs 2).
 Per-client instructions: https://photosweat.shop/remove-background-mcp
 
@@ -195,7 +195,7 @@ bytes, and `?params={"background":"white"}` to change the options.
 ## Limits
 
 - 10 MB per image; JPG, PNG or WebP.
-- 10 credits/day anonymously (per IP), 30 credits/day with a free account (the website and your API key share it).
+- 10 credits/day (60 a month) anonymously (per IP), 20 credits/day (100 a month) with a free account (the website and your API key share it).
 - Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout or
   an erase costs 1, an upscale or an old photo restoration 2.
 - Old-photo-restoration output is always a JPEG at most 1024 px on the long edge; a colour photo is

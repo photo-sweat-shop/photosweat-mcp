@@ -17,7 +17,7 @@ const API = DEFAULT_API;
 // 产品名（2026-11-25 统一）：这里原来写的是 "photo-workshop"，和线上服务卡、托管 MCP 的
 // serverInfo 对不上。`name` 是客户端上显示的实现名，标识符走 npm 包名 `photosweat-mcp`。
 const NAME = "Photo Sweat Shop";
-const VERSION = "0.3.5";
+const VERSION = "0.3.6";
 
 function paramZod(spec) {
   let s;

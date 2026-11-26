@@ -28,7 +28,7 @@ old photo restored (scratches reduced, colour brought back).
 Notes:
 
 - 10 MB max per image; JPG, PNG or WebP.
-- Free tier is 10 credits a day per IP with no key (a cutout costs 1; an upscale or an old photo restoration 2).
+- Free tier is 10 credits a day (60 a month) per IP with no key (a cutout costs 1; an upscale or an old photo restoration 2).
   Do not ask the user for a key unless the call fails with `quota_exceeded`.
 - Transparency needs `format: "png"` (the default). `jpeg` only works with an opaque background.
 - If the call returns `404 tool_paused`, the tool is temporarily disabled — tell the user

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "photosweat-mcp",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Remove backgrounds, upscale 2x/4x, restore old photos or make official-spec ID photos on one hosted MCP endpoint: nothing to install, no key to start.",
   "author": {
     "name": "Photo Sweat Shop",

@@ -1,15 +1,15 @@
 # Photo Sweat Shop MCP server
 
-An [MCP](https://modelcontextprotocol.io) server for **background removal, upscaling and
-old photo restoration**. An agent hands it the absolute path to a photo; it calls the hosted Photo Sweat
+An [MCP](https://modelcontextprotocol.io) server for **background removal, upscaling,
+old photo restoration and ID photos**. An agent hands it the absolute path to a photo; it calls the hosted Photo Sweat
 Shop API, writes the result next to the original, and returns that path.
 
-One server, several tools — today the live `remove_background` and the beta `upscale` and
-`colorize`, all named after their REST slugs. The list grows as capabilities open, and nothing
+One server, several tools — today the live `remove_background` and the beta `upscale`,
+`colorize` and `make_id_photo`, all named after their REST slugs. The list grows as capabilities open, and nothing
 is hand-written twice.
 
 No GPU, no API client to write, no key required to start — the free tier is 10 credits a day (60 a month)
-per IP (a cutout or an erase = 1 credit; an upscale or an old photo restoration = 2).
+per IP (a cutout or an erase = 1 credit; an upscale or an old photo restoration = 2; an ID photo = 3).
 
 ```text
 remove_background({ path: "/Users/me/photo.jpg" })
@@ -94,12 +94,12 @@ Claude Code:
 claude mcp add --transport http photosweat https://photosweat.shop/mcp
 ```
 
-That endpoint exposes three of the tools the local server registers — `remove_background`, the
-beta `upscale` and the beta `colorize` — taking `image_url` or `image_base64` and returning the
+That endpoint exposes all but one of the tools the local server registers — `remove_background`,
+the beta `upscale`, `colorize` and `make_id_photo` — taking `image_url` or `image_base64` and returning the
 result as an image content block. (`erase` is local-only: it needs a mask channel.) Names are
-derived from the REST slugs, so they match `POST /api/remove-background`, `POST /api/upscale` and
-`POST /api/colorize`. The anonymous quota is 10 credits/day (60 a month) per IP (a cutout costs 1; an upscale
-or an old photo restoration costs 2).
+derived from the REST slugs, so they match `POST /api/remove-background`, `POST /api/upscale`,
+`POST /api/colorize` and `POST /api/make-id-photo`. The anonymous quota is 10 credits/day (60 a month) per IP (a cutout costs 1; an upscale
+or an old photo restoration costs 2; an ID photo costs 3).
 Per-client instructions: https://photosweat.shop/remove-background-mcp
 
 Registered in the official MCP Registry as `shop.photosweat/remove-background`.
@@ -114,7 +114,7 @@ than resending the image.
 
 Tools are registered from `/api/capabilities` at startup, so a parameter's default is whatever
 that document says, and the names are the same ones the hosted endpoint uses. Today that is the
-live cutout and the beta upscale and colorize (plus the local-only `erase`).
+live cutout, the beta upscale, colorize and ID photos (plus the local-only `erase`).
 
 | Tool | Arguments |
 |---|---|
@@ -122,6 +122,7 @@ live cutout and the beta upscale and colorize (plus the local-only `erase`).
 | `upscale` *(beta)* | `path` (required), `out`, `scale`, `engine`, `face`, `verifyText` |
 | `colorize` *(beta)* | `path` (required), `out` |
 | `erase` *(beta)* | `path` (required), `mask` (required), `out` |
+| `make_id_photo` *(beta)* | `path` (required), `out`, `country` (required), `doc_type`, `bg` |
 
 - `path` — absolute path to a JPG / PNG / WebP file, 10 MB max.
 - `out` — where to write the result; defaults to `<input>-<capability>.<ext>`.
@@ -147,6 +148,13 @@ live cutout and the beta upscale and colorize (plus the local-only `erase`).
 - `verifyText` — **off by default**. Turn it on to OCR the source and the result and receive a
   list of missing or changed characters; it adds roughly 5 s on sparse text and up to 30 s on
   dense layouts, because it runs on CPU.
+- `country` — **`make_id_photo` only, required.** ISO 3166-1 alpha-2 code (`US`, `CN`, `DE`…).
+  `GET /api/idphoto/specs` lists all 82 supported countries and the documents each one has.
+- `doc_type` — **`make_id_photo` only.** E.g. `passport`, `visa`, `visa_dv`; omitted means that
+  country's passport.
+- `bg` — **`make_id_photo` only.** `auto` (default, the spec's own background) or `#rrggbb`.
+  Specs that must be met on site or at a certified studio are rejected with `bad_param` instead
+  of being rendered.
 
 `erase` is **beta** as of 2026-11-23. This stdio server already knows how to send a mask, so it
 registers the tool with an extra `mask` argument (absolute path to a PNG: white = the area to
@@ -160,6 +168,14 @@ the original, with the aspect ratio unchanged. An absolute `path` is all it take
 parameters, because the whole photo including faces is redrawn in one pass (nothing is pasted
 back). Colour photos are restored too — same model, same 2 credits, no short-circuit — and every
 result comes back as a JPEG at most 1024 px on the long edge.
+
+`make_id_photo` is **beta** as of 2026-11-27. It crops and places the head to an issuing
+authority's published spec and returns a JPEG at that spec's pixel size. `country` is a required
+ISO 3166-1 alpha-2 code (82 supported; `GET /api/idphoto/specs` lists them all), `doc_type`
+defaults to that country's passport, and `bg` takes `auto` (the spec's background) or an
+`#rrggbb`. Specs that must be done on site or by a certified studio are rejected up front with
+`bad_param` rather than rendered. No approval guarantee: the photo meets the published numbers,
+and that is all it claims.
 
 Other capabilities in the document (enhance, extend, scan-text, generate) are
 `paused` and will be registered automatically if they reopen.
@@ -197,7 +213,7 @@ bytes, and `?params={"background":"white"}` to change the options.
 - 10 MB per image; JPG, PNG or WebP.
 - 10 credits/day (60 a month) anonymously (per IP), 20 credits/day (100 a month) with a free account (the website and your API key share it).
 - Past the free allowance: prepaid credits at **$0.01/credit** ($10 = 1,000 credits); a cutout or
-  an erase costs 1, an upscale or an old photo restoration 2.
+  an erase costs 1, an upscale or an old photo restoration 2, an ID photo 3.
 - Old-photo-restoration output is always a JPEG at most 1024 px on the long edge; a colour photo is
   restored by the same redraw and costs the same 2 credits.
 - Anonymous requests are rate-limited to 30/minute.
